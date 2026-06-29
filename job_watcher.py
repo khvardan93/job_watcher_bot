@@ -320,7 +320,6 @@ def main():
                 f"[ERROR] Delivery failed - {len(new_matches)} match(es) NOT marked as seen, will retry next run."
             )
     else:
-        send_telegram_message(f"No new matches — {now}")
         print("No new matches this run.")
 
     save_seen(seen)
