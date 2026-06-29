@@ -302,8 +302,9 @@ def main():
             new_matches.append({**post, "company": f"@{channel}"})
             seen.add(post["id"])
 
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     if new_matches:
-        lines = [f"<b>{len(new_matches)} new Unity job(s) found</b>"]
+        lines = [f"<b>{len(new_matches)} new Unity job(s) found</b> — {now}"]
         separator = "-" * 60
         for m in new_matches:
             loc = f" - {m['location']}" if m["location"] else ""
@@ -319,6 +320,7 @@ def main():
                 f"[ERROR] Delivery failed - {len(new_matches)} match(es) NOT marked as seen, will retry next run."
             )
     else:
+        send_telegram_message(f"No new matches — {now}")
         print("No new matches this run.")
 
     save_seen(seen)
