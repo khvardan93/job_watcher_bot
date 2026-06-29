@@ -23,72 +23,21 @@ import json
 import os
 import re
 import sys
-import time
 import urllib.request
 import urllib.error
 from datetime import datetime, timedelta, timezone
 
-# ---------------------------------------------------------------------------
-# CONFIG - edit this section
-# ---------------------------------------------------------------------------
-
-# How to add a company:
-#   Greenhouse: visit the company's careers page. If the URL (or the page it
-#               redirects to) looks like:
-#                   https://job-boards.greenhouse.io/<TOKEN>
-#                   https://boards.greenhouse.io/<TOKEN>
-#               then ats="greenhouse", token="<TOKEN>"
-#               Verify by opening: https://boards-api.greenhouse.io/v1/boards/<TOKEN>/jobs
-#               -> should return JSON, not an error.
-#
-#   Lever:      if the URL looks like:
-#                   https://jobs.lever.co/<TOKEN>
-#               then ats="lever", token="<TOKEN>"
-#               Verify by opening: https://api.lever.co/v0/postings/<TOKEN>?mode=json
-#               -> should return a JSON array, not an error.
-#
-# Verified working example included below (Cloud Chamber / Greenhouse).
-# Add your own below it - check each one with the verification URLs above
-# before relying on it, since tokens occasionally change.
-
-COMPANIES = [
-    {"name": "Cloud Chamber", "ats": "greenhouse", "token": "cloudchamberen"},
-    {"name": "Scopely", "ats": "greenhouse", "token": "scopely"},
-    {"name": "Voodoo", "ats": "lever", "token": "voodoo"},
-    # {"name": "Niantic", "ats": "greenhouse", "token": "niantic"},  # returns 404 live - token may have changed, verify manually before re-adding
-    # {"name": "Some Studio", "ats": "greenhouse", "token": "somestudio"},
-    # {"name": "Some Other Studio", "ats": "lever", "token": "someotherstudio"},
-]
-
-REQUIRE_ALL = ["unity"]  # ALL of these must appear somewhere in the title/text
-REQUIRE_ANY = ["engineer", "developer", "разработчик"]  # at least ONE of these must also appear (leave empty list to disable)
-MAX_GAP_BETWEEN_ALL_AND_ANY = 50
-
-# Only notify about postings dated within this many days. Set to None to
-# disable age filtering entirely (notify regardless of how old a posting is).
-MAX_AGE_DAYS = 7
-
-# Public Telegram channels to scan for postings (uses the public, no-login
-# web preview at t.me/s/<channel> - same idea as Greenhouse/Lever: content
-# Telegram itself serves openly, no auth/bot-membership needed).
-# Use the channel's @username without the @ sign.
-TELEGRAM_CHANNELS = [
-    "ingamejob_dev",   # InGameJob - programming/dev roles, frequently posts Unity
-    "devjobs",         # Game Development Jobs - mixed company posts + candidate self-promo
-    "unityjobs_pub",   # Unity-specific jobs channel
-    "forgamedev",   
-    "bestjobinarmenia",   
-    "gamedevjob",   
-    "unity_jobs",   
-    "itdigitaldevhunt",   
-    "jobs_poland_peopleup",   
-]
-
-# Telegram - set these as environment variables (recommended) or hardcode below.
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-
-SEEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "seen_jobs.json")
+from config import (
+    COMPANIES,
+    MAX_AGE_DAYS,
+    MAX_GAP_BETWEEN_ALL_AND_ANY,
+    REQUIRE_ALL,
+    REQUIRE_ANY,
+    SEEN_FILE,
+    TELEGRAM_BOT_TOKEN,
+    TELEGRAM_CHAT_ID,
+    TELEGRAM_CHANNELS,
+)
 
 # ---------------------------------------------------------------------------
 # Fetchers
