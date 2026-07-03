@@ -25,6 +25,7 @@ TELEGRAM_CHANNELS = [
     "unity_jobs",
     "itdigitaldevhunt",
     "jobs_poland_peopleup",
+    "young_gamedev"
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
